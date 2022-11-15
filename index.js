@@ -1,42 +1,33 @@
 const express = require("express")
-const mysql = require("mysql")
 const cors = require("cors")
 const port = 3000
 const app = express()
-const { university } = require("./models/university.js")
+const helpers = require("./helpers.js")
+const { getUniversity, showUniversity, updateUniversityName } = require("./services/services.js")
+// const { university } = require("./models/university.js")
+
+let university = []
 
 // Cors Setup
 const corsOptions = {
     origin: "http://localhost:5173",
-    optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+    optionsSuccessStatus: 200
 }
 app.use(cors(corsOptions))
 
-// Mysql Connection
-const mysqlConnectionOptions = {
-    host: '127.0.0.1',
-    database: 'test',
-    user: 'root',
-    password: 'admin',
-}
-const mysqlConnection = mysql.createConnection(mysqlConnectionOptions)
-mysqlConnection.connect()
-
-// Mysql Queries
-mysqlConnection.query('SELECT * from users', (err, rows, fields) => {
-    if (err) throw err
-    console.log('The solution is: ', rows)
-})
-mysqlConnection.end()
-
-
 // Routes
 app.get("/", (req, res) => {
-    res.send("Hello world!")
+    getUniversity(req, res)
 })
 
-app.get("/university", (req, res) => {
-    res.json(university)
+// Show
+app.get("/:id", async (req, res) => {
+    await showUniversity(req, res, 'ID', parseInt(req.params.id))
+})
+
+// Update
+app.get("/:id/update-name", async (req, res) => {
+    await updateUniversityName(req, res, 'ID', parseInt(req.params.id), req.query.name)
 })
 
 app.listen(port, (error) => {
